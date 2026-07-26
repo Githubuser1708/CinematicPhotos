@@ -22,7 +22,7 @@ Example of the CinematicPhoto App Photos
 #Below is the Melody AI APP UI
 
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
+<img width="1200" height="700" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
 </div>
 
 ## 🚀 Features
