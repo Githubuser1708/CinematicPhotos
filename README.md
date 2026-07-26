@@ -40,6 +40,7 @@ The AI generates the person wearing the selected outfit while maintaining the vi
 Users can select from the cinematic vibe options available in the application.
 
 The selected vibe influences the visual atmosphere, mood, styling, lighting, composition and overall cinematic appearance of the generated image.
+E.g Corporate Shoot, Casual Shoot, Graduation Shoot, Baby Photoshoot
 
 ### 🖼️ Generate Cinematic Photos
 
