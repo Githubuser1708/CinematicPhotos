@@ -17,13 +17,6 @@ The application combines:
 
 The result is a new AI-generated image that places the person in a cinematic environment, wearing the selected outfit and posing naturally according to the selected vibe.
 
-Example of the CinematicPhoto App Photos
-
-#Below is the Melody AI APP UI
-
-<div align="center">
-<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
-</div>
 
 ## 🚀 Features
 
@@ -59,6 +52,13 @@ The AI combines the user's:
 3. Selected cinematic vibe
 
 It then generates a cinematic image showing the person wearing the selected outfit and naturally posed within a visually immersive environment based on the selected vibe.
+
+### Example of the CinematicPhoto App UI and generated Photos
+
+<div align="center">
+<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
+</div>
+
 
 ## 🧠 How It Works
 
