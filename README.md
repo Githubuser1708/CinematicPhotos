@@ -50,7 +50,11 @@ The AI combines the user's:
 1. Uploaded photo
 2. Selected outfit
 3. Selected cinematic vibe
- E.g Corporate Shoot, Casual Shoot, Graduation Shoot, Baby Photoshoot
+ E.g Corporate Shoot,
+     Casual Shoot,
+     Graduation Shoot,
+     Baby Photoshoot.
+     Personal Makeover Shoot
 
 It then generates a cinematic image showing the person wearing the selected outfit and naturally posed within a visually immersive environment based on the selected vibe.
 
@@ -60,6 +64,11 @@ It then generates a cinematic image showing the person wearing the selected outf
 <img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
 </div>
 
+
+
+<div align="center">
+<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyshoot2.png"/>
+</div>
 
 ## 🧠 How It Works
 
