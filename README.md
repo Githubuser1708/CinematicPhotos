@@ -61,14 +61,15 @@ It then generates a cinematic image showing the person wearing the selected outf
 ### Example of the CinematicPhoto App UI and generated Photos
 
 <div align="center">
+<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyshoot2.png"/>
+</div>
+
+
+<div align="center">
 <img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
 </div>
 
 
-
-<div align="center">
-<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyshoot2.png"/>
-</div>
 
 ## 🧠 How It Works
 
