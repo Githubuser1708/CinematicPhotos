@@ -63,10 +63,13 @@ It then generates a cinematic image showing the person wearing the selected outf
 <img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/bphoto4.png"/>
 </div>
 
+</>
+</>
 <div align="center">
-<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyshoot2.png"/>
+<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyp.png"/>
 </div>
-
+</>
+</>
 
 <div align="center">
 <img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/creationphoto.png"/>
