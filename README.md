@@ -59,6 +59,9 @@ The AI combines the user's:
 It then generates a cinematic image showing the person wearing the selected outfit and naturally posed within a visually immersive environment based on the selected vibe.
 
 ### Example of the CinematicPhoto App UI and generated Photos
+<div align="center">
+<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/bphoto4.png"/>
+</div>
 
 <div align="center">
 <img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/babyshoot2.png"/>
