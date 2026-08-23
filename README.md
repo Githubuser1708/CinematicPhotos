@@ -21,9 +21,6 @@ The result is a new AI-generated image that places the person in a cinematic env
 ## 🚀 Features
 
 ### Example of the CinematicPhoto App UI and generated Photos
-<div align="center">
-<img width="1200" height="900" alt="GHBanner" src="https://github.com/Githubuser1708/CinematicPhotos/blob/main/blob/bphoto4.png"/>
-</div>
 
 </>
 </>
