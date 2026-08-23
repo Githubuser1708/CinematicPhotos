@@ -1,6 +1,6 @@
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'model';
+  role: "user" | "model";
   text: string;
   timestamp: number;
 }
@@ -13,9 +13,9 @@ export interface Vibe {
 }
 
 export enum AppMode {
-  PRE_WEDDING = 'PRE_WEDDING',
-  IMAGE_EDITOR = 'IMAGE_EDITOR',
-  CHAT_BOT = 'CHAT_BOT',
+  PRE_WEDDING = "PRE_WEDDING",
+  IMAGE_EDITOR = "IMAGE_EDITOR",
+  CHAT_BOT = "CHAT_BOT",
 }
 
 export interface GeneratedImage {

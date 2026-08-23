@@ -1,132 +1,75 @@
-import { GoogleGenAI, GenerateContentResponse, Chat } from "@google/genai";
-
-// Models
-const CHAT_MODEL = 'gemini-3-pro-preview';
-const EDIT_MODEL_NANO = 'gemini-2.5-flash-image';
-const GEN_MODEL_HIGH_QUALITY = 'gemini-3-pro-image-preview';
-
-// Helper to get a new AI client instance (important for picking up updated API keys)
-const getAiClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
-};
-
 /**
- * Chat with the AI assistant (Streaming)
+ * Client-side service calling server API routes
  */
-export const createChatSession = () => {
-  const ai = getAiClient();
-  return ai.chats.create({
-    model: CHAT_MODEL,
-    config: {
-      systemInstruction: 'You are a helpful and knowledgeable wedding planning assistant. You can help with scheduling, etiquette, style advice, and general questions.',
-    },
-  });
-};
 
-export const sendMessageStream = async (chat: Chat, message: string) => {
-  return await chat.sendMessageStream({ message });
-};
-
-/**
- * Edit an image using Gemini 2.5 Flash Image (Nano Banana)
- */
-export const editImage = async (
-  imageBase64: string,
-  mimeType: string,
-  prompt: string
-): Promise<string> => {
-  try {
-    const ai = getAiClient();
-    const response = await ai.models.generateContent({
-      model: EDIT_MODEL_NANO,
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              data: imageBase64,
-              mimeType: mimeType,
-            },
-          },
-          {
-            text: prompt,
-          },
-        ],
-      },
-    });
-
-    // Extract image from response
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
-      }
-    }
-    throw new Error('No image generated.');
-  } catch (error) {
-    console.error('Edit Image Error:', error);
-    throw error;
-  }
-};
-
-/**
- * Generate Pre-wedding photo using Gemini 3 Pro Image Preview
- * This treats the task as a high-fidelity image-to-image/generation task.
- */
 export const generatePreWeddingPhoto = async (
   referenceImages: { base64: string; mimeType: string }[],
   styleDescription: string,
   customPrompt?: string
 ): Promise<string> => {
-  try {
-    const ai = getAiClient();
-    const parts = [];
+  const res = await fetch('/api/generate-photo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      referenceImages,
+      styleDescription,
+      customPrompt,
+    }),
+  });
 
-    // Add reference images
-    referenceImages.forEach((img) => {
-      parts.push({
-        inlineData: {
-          data: img.base64,
-          mimeType: img.mimeType,
-        },
-      });
-    });
-
-    // Construct the prompt
-    let promptText = `
-    Generate a high-quality, professional photo based on these rules:
-    1. Identity Preservation: Use the uploaded photo(s) as the source for facial identity and model appearance. Maintain face shape, eyes, hair, and skin tone.
-    2. Style: ${styleDescription}
-    3. Quality: Cinematic lighting, 4k resolution, photorealistic, sharp focus, beautiful warm tones.
-    `;
-
-    if (customPrompt) {
-      promptText += `\n4. Additional Details: ${customPrompt}`;
-    }
-
-    parts.push({ text: promptText });
-
-    const response = await ai.models.generateContent({
-      model: GEN_MODEL_HIGH_QUALITY,
-      contents: {
-        parts: parts,
-      },
-      config: {
-        imageConfig: {
-            imageSize: '2K',
-            aspectRatio: '3:4' // Portrait-ish suitable for wedding photos
-        }
-      }
-    });
-
-     // Extract image from response
-     for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
-        }
-      }
-      throw new Error('No pre-wedding image generated.');
-
-  } catch (error) {
-    console.error('Pre-wedding Gen Error:', error);
-    throw error;
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to generate photo.');
   }
+
+  if (!data.imageUrl) {
+    throw new Error('No image returned from server.');
+  }
+
+  return data.imageUrl;
+};
+
+export const editImage = async (
+  imageBase64: string,
+  mimeType: string,
+  prompt: string
+): Promise<string> => {
+  const res = await fetch('/api/edit-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      imageBase64,
+      mimeType,
+      prompt,
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to edit image.');
+  }
+
+  if (!data.imageUrl) {
+    throw new Error('No edited image returned from server.');
+  }
+
+  return data.imageUrl;
+};
+
+export const sendChatMessage = async (
+  history: { role: string; text: string }[],
+  message: string
+): Promise<string> => {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ history, message }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to get chat response.');
+  }
+
+  return data.text || '';
 };

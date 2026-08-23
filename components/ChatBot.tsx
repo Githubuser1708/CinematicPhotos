@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createChatSession, sendMessageStream } from '../services/geminiService';
+import { sendChatMessage } from '../services/geminiService';
 import { ChatMessage } from '../types';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
-import { GenerateContentResponse } from '@google/genai';
 
 const ChatBot: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatSessionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Initialize chat session on mount
-    chatSessionRef.current = createChatSession();
-    
     // Add initial greeting
     setMessages([
       {
@@ -31,7 +26,7 @@ const ChatBot: React.FC = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !chatSessionRef.current) return;
+    if (!input.trim() || isLoading) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -40,38 +35,33 @@ const ChatBot: React.FC = () => {
       timestamp: Date.now(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
     try {
-      const resultStream = await sendMessageStream(chatSessionRef.current, userMsg.text);
-      
-      const botMsgId = (Date.now() + 1).toString();
-      let fullResponse = '';
+      const history = messages.map((m) => ({ role: m.role, text: m.text }));
+      const responseText = await sendChatMessage(history, userMsg.text);
 
-      // Add placeholder bot message
-      setMessages((prev) => [
-        ...prev,
-        { id: botMsgId, role: 'model', text: '', timestamp: Date.now() },
-      ]);
+      const botMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: responseText,
+        timestamp: Date.now(),
+      };
 
-      for await (const chunk of resultStream) {
-        const c = chunk as GenerateContentResponse;
-        const text = c.text || '';
-        fullResponse += text;
-        
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMsgId ? { ...msg, text: fullResponse } : msg
-          )
-        );
-      }
-    } catch (error) {
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (error: any) {
       console.error('Chat Error:', error);
       setMessages((prev) => [
         ...prev,
-        { id: Date.now().toString(), role: 'model', text: "I'm sorry, I encountered an error. Please try again.", timestamp: Date.now() },
+        {
+          id: Date.now().toString(),
+          role: 'model',
+          text: error?.message || "I'm sorry, I encountered an error. Please try again.",
+          timestamp: Date.now(),
+        },
       ]);
     } finally {
       setIsLoading(false);

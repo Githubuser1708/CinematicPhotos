@@ -1,0 +1,273 @@
+import express from "express";
+import path from "path";
+import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
+
+const app = express();
+const PORT = 3000;
+
+// High body limit for base64 image uploads
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+const getAi = () => {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      },
+    },
+  });
+};
+
+// API Routes
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// Chat endpoint
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { history, message } = req.body;
+    const ai = getAi();
+
+    const formattedHistory = (history || []).map((h: any) => ({
+      role: h.role === "user" ? "user" : "model",
+      parts: [{ text: h.text }],
+    }));
+
+    const chat = ai.chats.create({
+      model: "gemini-3.6-flash",
+      config: {
+        systemInstruction:
+          "You are a helpful and knowledgeable photography and style assistant. You can help with concept ideas, photo styling, lighting, and general questions.",
+      },
+      history: formattedHistory,
+    });
+
+    const response = await chat.sendMessage({ message });
+    res.json({ text: response.text });
+  } catch (error: any) {
+    console.error("Chat API Error:", error);
+    res.status(500).json({ error: error?.message || "Failed to process chat" });
+  }
+});
+
+// Image edit endpoint
+app.post("/api/edit-image", async (req, res) => {
+  try {
+    const { imageBase64, mimeType, prompt } = req.body;
+    if (!imageBase64 || !prompt) {
+      return res.status(400).json({ error: "Missing image or prompt" });
+    }
+
+    const ai = getAi();
+    const modelsToTry = [
+      "gemini-3.1-flash-image",
+      "gemini-3.1-flash-lite-image",
+    ];
+    let lastError: any = null;
+
+    for (const model of modelsToTry) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: {
+            parts: [
+              {
+                inlineData: {
+                  data: imageBase64,
+                  mimeType: mimeType || "image/png",
+                },
+              },
+              { text: prompt },
+            ],
+          },
+        });
+
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+          if (part.inlineData) {
+            return res.json({
+              imageUrl: `data:image/png;base64,${part.inlineData.data}`,
+            });
+          }
+        }
+      } catch (err: any) {
+        console.warn(
+          `Edit model ${model} failed, trying fallback:`,
+          err?.message || err,
+        );
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error("No image generated.");
+  } catch (error: any) {
+    console.error("Edit Image Error:", error);
+    res.status(500).json({ error: error?.message || "Failed to edit image" });
+  }
+});
+
+import Stripe from "stripe";
+
+let stripeClient: Stripe | null = null;
+export function getStripe(): Stripe {
+  if (!stripeClient) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is required");
+    }
+    stripeClient = new Stripe(key);
+  }
+  return stripeClient;
+}
+
+// Stripe checkout endpoint
+app.post("/api/checkout", async (req, res) => {
+  try {
+    const stripe = getStripe();
+    const { photoUrl } = req.body; // In a real app, we'd use this to grant access post-payment
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "High Resolution Cinematic Photo",
+              description: "Full 8K resolution download without watermarks.",
+            },
+            unit_amount: 499, // $4.99
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:3000/?payment=success",
+      cancel_url: "http://localhost:3000/?payment=cancel",
+    });
+
+    res.json({ url: session.url });
+  } catch (error: any) {
+    console.error("Stripe Error:", error);
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to create checkout session" });
+  }
+});
+
+// Generate photo endpoint
+app.post("/api/generate-photo", async (req, res) => {
+  try {
+    const { referenceImages, styleDescription, customPrompt } = req.body;
+    if (
+      !referenceImages ||
+      !Array.isArray(referenceImages) ||
+      referenceImages.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ error: "At least one reference image is required." });
+    }
+
+    const ai = getAi();
+    const parts: any[] = [];
+
+    referenceImages.forEach((img: { base64: string; mimeType: string }) => {
+      parts.push({
+        inlineData: {
+          data: img.base64,
+          mimeType: img.mimeType || "image/jpeg",
+        },
+      });
+    });
+
+    let promptText = `
+Generate a high-quality, professional cinematic photo based on these rules:
+1. Identity Preservation: Preserve the exact facial identity, eyes, nose, lips, hair, and natural skin tone from the reference photo(s).
+2. Style & Concept: ${styleDescription || "Cinematic soft decor studio portrait"}
+3. Quality: Ultra-detailed 8K photographic quality, professional lighting, rich color grading, sharp focus, beautiful depth of field.
+`;
+
+    if (customPrompt) {
+      promptText += `\n4. Additional Directives: ${customPrompt}`;
+    }
+
+    parts.push({ text: promptText });
+
+    const modelsToTry = [
+      { name: "gemini-3.1-flash-image", size: "1K" },
+      { name: "gemini-3.1-flash-image", size: undefined },
+      { name: "gemini-3.1-flash-lite-image", size: undefined },
+      { name: "gemini-3-pro-image", size: "1K" },
+    ];
+
+    let lastError: any = null;
+
+    for (const targetModel of modelsToTry) {
+      try {
+        const config: any = {
+          imageConfig: {
+            aspectRatio: "3:4",
+          },
+        };
+        if (targetModel.size) {
+          config.imageConfig.imageSize = targetModel.size;
+        }
+
+        const response = await ai.models.generateContent({
+          model: targetModel.name,
+          contents: { parts },
+          config,
+        });
+
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+          if (part.inlineData) {
+            return res.json({
+              imageUrl: `data:image/png;base64,${part.inlineData.data}`,
+            });
+          }
+        }
+      } catch (err: any) {
+        console.warn(
+          `Model ${targetModel.name} failed, trying fallback:`,
+          err?.message || err,
+        );
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error("Failed to generate image.");
+  } catch (error: any) {
+    console.error("Generate Photo Error:", error);
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to generate photo" });
+  }
+});
+
+// Vite middleware setup
+async function startServer() {
+  if (process.env.NODE_ENV !== "production") {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*all", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();

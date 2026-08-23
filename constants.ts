@@ -1,65 +1,70 @@
-import { Vibe } from './types';
+import { Vibe } from "./types";
 
 export const VIBES: Vibe[] = [
   {
-    id: 'korean_indoor',
-    title: 'Indoor Soft Decor Studio',
-    description: 'Clean pastel tones, bright, elegant, airy curtains, soft lighting.'
+    id: "korean_indoor",
+    title: "Indoor Soft Decor Studio",
+    description:
+      "Clean pastel tones, bright, elegant, airy curtains, soft lighting.",
   },
   {
-    id: 'nature_forest',
-    title: 'Nature Forest Mood',
-    description: 'Tall trees, natural sunlight beams, warm romantic tones.'
+    id: "nature_forest",
+    title: "Nature Forest Mood",
+    description: "Tall trees, natural sunlight beams, warm romantic tones.",
   },
   {
-    id: 'evening_lights',
-    title: 'Romantic Evening Fairy Lights',
-    description: 'Warm glowing lights, dreamy ambience, bokeh effects.'
+    id: "evening_lights",
+    title: "Romantic Evening Fairy Lights",
+    description: "Warm glowing lights, dreamy ambience, bokeh effects.",
   },
   {
-    id: 'luxury_ballroom',
-    title: 'Luxury Indoor Ballroom',
-    description: 'Grand chandeliers, polished floor, elegant classical look.'
+    id: "luxury_ballroom",
+    title: "Luxury Indoor Ballroom",
+    description: "Grand chandeliers, polished floor, elegant classical look.",
   },
   {
-    id: 'sunset_beach',
-    title: 'Sunset Beach Pastel Glow',
-    description: 'Soft waves, orange sky, cinematic feeling, gentle breeze.'
+    id: "sunset_beach",
+    title: "Sunset Beach Pastel Glow",
+    description: "Soft waves, orange sky, cinematic feeling, gentle breeze.",
   },
   {
-    id: 'japanese_sakura',
-    title: 'Japanese Sakura Theme',
-    description: 'Cherry blossoms, soft pink, airy atmosphere, spring vibes.'
+    id: "japanese_sakura",
+    title: "Japanese Sakura Theme",
+    description: "Cherry blossoms, soft pink, airy atmosphere, spring vibes.",
   },
   {
-    id: 'minimalist_modern',
-    title: 'Minimalist Modern Studio',
-    description: 'Clean interior, simple & classy, high fashion aesthetic.'
+    id: "minimalist_modern",
+    title: "Minimalist Modern Studio",
+    description: "Clean interior, simple & classy, high fashion aesthetic.",
   },
   {
-    id: 'vintage_film',
-    title: 'Vintage Film Outdoor',
-    description: 'Muted tones, classic film grain, nostalgic feel.'
+    id: "vintage_film",
+    title: "Vintage Film Outdoor",
+    description: "Muted tones, classic film grain, nostalgic feel.",
   },
   {
-    id: 'botanical_greenhouse',
-    title: 'Botanical Greenhouse',
-    description: 'Glasshouse with lush plants, soft natural light, organic feel.'
+    id: "botanical_greenhouse",
+    title: "Botanical Greenhouse",
+    description:
+      "Glasshouse with lush plants, soft natural light, organic feel.",
   },
   {
-    id: 'fantasy_ethereal',
-    title: 'Fantasy Ethereal Theme',
-    description: 'Magical landscapes, floating islands, mystic castles, dreamy supernatural lighting.'
+    id: "fantasy_ethereal",
+    title: "Fantasy Ethereal Theme",
+    description:
+      "Magical landscapes, floating islands, mystic castles, dreamy supernatural lighting.",
   },
   {
-    id: 'ocean_underwater',
-    title: 'Deep Ocean Theme',
-    description: 'Underwater aesthetic, coral reefs, blue marine tones, rays of light through water.'
+    id: "ocean_underwater",
+    title: "Deep Ocean Theme",
+    description:
+      "Underwater aesthetic, coral reefs, blue marine tones, rays of light through water.",
   },
   {
-    id: 'iconic_landmarks',
-    title: 'Iconic World Landmarks',
-    description: 'Famous structures (Eiffel Tower, Taj Mahal), historic architecture, grand travel vibes.'
+    id: "iconic_landmarks",
+    title: "Iconic World Landmarks",
+    description:
+      "Famous structures (Eiffel Tower, Taj Mahal), historic architecture, grand travel vibes.",
   },
 ];
 
