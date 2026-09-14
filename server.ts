@@ -125,29 +125,38 @@ export function getStripe(): Stripe {
 }
 
 // Stripe checkout endpoint
-app.post("/api/checkout", async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const stripe = getStripe();
-    const { photoUrl } = req.body; // In a real app, we'd use this to grant access post-payment
+    const { imageId } = req.body;
+    
+    if (!imageId) {
+      return res.status(400).json({ error: "Missing imageId" });
+    }
+
+    const origin = req.headers.origin || "http://localhost:3000";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: "sgd",
             product_data: {
               name: "High Resolution Cinematic Photo",
               description: "Full 8K resolution download without watermarks.",
             },
-            unit_amount: 499, // $4.99
+            unit_amount: 499, // $4.99 SGD
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: "http://localhost:3000/?payment=success",
-      cancel_url: "http://localhost:3000/?payment=cancel",
+      metadata: {
+        imageId: imageId,
+      },
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/payment-cancelled`,
     });
 
     res.json({ url: session.url });

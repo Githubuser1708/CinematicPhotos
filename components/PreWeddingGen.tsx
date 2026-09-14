@@ -341,24 +341,20 @@ const PreWeddingGen: React.FC<PreWeddingGenProps> = ({ onGenerateSuccess }) => {
                         setIsCheckingOut(true);
                         setCheckoutError(null);
                         try {
-                          const res = await fetch("/api/checkout", {
+                          const res = await fetch("/api/create-checkout-session", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ photoUrl: generatedImage }),
+                            body: JSON.stringify({ imageId: generatedImage }),
                           });
                           const data = await res.json();
                           if (data.url) {
-                            if (window.top) {
-                              window.top.location.href = data.url;
-                            } else {
-                              window.location.href = data.url;
-                            }
+                            window.open(data.url, "_blank");
                           } else {
                             setCheckoutError(data.error || "Unknown error");
                           }
-                        } catch (error) {
+                        } catch (error: any) {
                           console.error("Checkout error:", error);
-                          setCheckoutError("Failed to start checkout.");
+                          setCheckoutError(error?.message || "Failed to start checkout.");
                         } finally {
                           setIsCheckingOut(false);
                         }

@@ -169,18 +169,14 @@ const App: React.FC = () => {
                         <button
                           onClick={async () => {
                             try {
-                              const res = await fetch("/api/checkout", {
+                              const res = await fetch("/api/create-checkout-session", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ photoUrl: url }),
+                                body: JSON.stringify({ imageId: url }),
                               });
                               const data = await res.json();
                               if (data.url) {
-                                if (window.top) {
-                                  window.top.location.href = data.url;
-                                } else {
-                                  window.location.href = data.url;
-                                }
+                                window.open(data.url, "_blank");
                               } else {
                                 setArchiveCheckoutError(
                                   data.error || "Unknown error",
